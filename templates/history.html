@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Patient History — RetinaScan{% endblock %}
+
+{% block content %}
+<h1>Patient history</h1>
+<p style="color:var(--muted); margin-bottom:20px;">All screenings recorded in RetinaScan.</p>
+
+<form method="POST" action="{{ url_for('search') }}" class="search-row">
+  <input type="text" name="name" placeholder="Search by patient name…">
+  <button type="submit" class="btn btn-secondary" style="width:auto;">Search</button>
+  <a href="{{ url_for('history') }}" class="btn btn-secondary" style="width:auto;">Reset</a>
+</form>
+
+<div class="card">
+  {% if patients %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Patient</th>
+        <th>Age</th>
+        <th>Prediction</th>
+        <th>Confidence</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in patients %}
+      <tr>
+        <td class="mono">{{ p[0] }}</td>
+        <td>{{ p[1] }}</td>
+        <td>{{ p[2] }}</td>
+        <td>
+          {% if p[3] == "No DR" %}
+            <span class="badge badge-none">{{ p[3] }}</span>
+          {% elif p[3] == "Mild" %}
+            <span class="badge badge-mild">{{ p[3] }}</span>
+          {% elif p[3] == "Moderate" %}
+            <span class="badge badge-moderate">{{ p[3] }}</span>
+          {% elif p[3] == "Severe" %}
+            <span class="badge badge-severe">{{ p[3] }}</span>
+          {% else %}
+            <span class="badge badge-proliferative">{{ p[3] }}</span>
+          {% endif %}
+        </td>
+        <td class="mono">{{ p[4] }}%</td>
+        <td class="mono" style="font-size:0.82rem; color:var(--muted);">{{ p[6] }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state">No patient records yet. Run a screening to see it here.</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Result — RetinaScan{% endblock %}
+
+{% block content %}
+
+{% if result == "No DR" %}
+  {% set badge_class = "none" %}
+{% elif result == "Mild" %}
+  {% set badge_class = "mild" %}
+{% elif result == "Moderate" %}
+  {% set badge_class = "moderate" %}
+{% elif result == "Severe" %}
+  {% set badge_class = "severe" %}
+{% else %}
+  {% set badge_class = "proliferative" %}
+{% endif %}
+
+<div class="result-header">
+  <h1 style="margin:0;">Screening result</h1>
+</div>
+
+<div class="grid grid-2">
+  <div class="card">
+    <h3 style="margin-bottom:14px;">{{ patient }} &nbsp;·&nbsp; Age {{ age }}</h3>
+
+    <p style="margin-bottom:6px;">
+      <span class="badge badge-{{ badge_class }}">{{ result }}</span>
+      &nbsp;
+      <span class="mono" style="color:var(--muted); font-size:0.88rem;">
+        {{ confidence }}% confidence
+      </span>
+    </p>
+
+    <div class="observation-box">
+      {{ observation }}
+    </div>
+
+    <div class="result-images">
+      <figure>
+        <img src="{{ '/' + image }}" alt="Uploaded fundus image">
+        <figcaption>Original image</figcaption>
+      </figure>
+      {% if heatmap %}
+      <figure>
+        <img src="{{ '/' + heatmap }}" alt="Grad-CAM heatmap">
+        <figcaption>Grad-CAM heatmap</figcaption>
+      </figure>
+      {% else %}
+      <figure style="display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:0.85rem; padding:20px;">
+        Heatmap unavailable
+      </figure>
+      {% endif %}
+    </div>
+
+    <div style="display:flex; gap:10px; margin-top:6px;">
+      {% if report %}
+      <a class="btn btn-primary" style="width:auto;" href="{{ url_for('download_report', filename=report) }}">
+        Download PDF report
+      </a>
+      {% endif %}
+      <a class="btn btn-secondary" href="{{ url_for('home') }}">Screen another image</a>
+    </div>
+
+    <div class="disclaimer">
+      AI-assisted screening result. Intended to support, not replace,
+      professional medical diagnosis.
+    </div>
+  </div>
+
+  <div class="card" style="align-self:start;">
+    <h3>Severity scale</h3>
+    <table class="data-table">
+      <tbody>
+        <tr><td><span class="badge badge-none">No DR</span></td><td style="color:var(--muted); font-size:0.85rem;">Routine check-up</td></tr>
+        <tr><td><span class="badge badge-mild">Mild</span></td><td style="color:var(--muted); font-size:0.85rem;">Follow-up advised</td></tr>
+        <tr><td><span class="badge badge-moderate">Moderate</span></td><td style="color:var(--muted); font-size:0.85rem;">Specialist consult</td></tr>
+        <tr><td><span class="badge badge-severe">Severe</span></td><td style="color:var(--muted); font-size:0.85rem;">Urgent attention</td></tr>
+        <tr><td><span class="badge badge-proliferative">Proliferative</span></td><td style="color:var(--muted); font-size:0.85rem;">Immediate referral</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

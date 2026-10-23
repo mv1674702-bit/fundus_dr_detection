@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}RetinaScan{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+{% macro ring_mark(size=30, color='#E7F3F0') %}
+<svg width="{{ size }}" height="{{ size }}" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="20" cy="20" r="18" stroke="{{ color }}" stroke-width="1.4" opacity="0.55"/>
+  <circle cx="20" cy="20" r="13" stroke="{{ color }}" stroke-width="1.4" opacity="0.75"/>
+  <circle cx="20" cy="20" r="8" stroke="{{ color }}" stroke-width="1.6"/>
+  <circle cx="20" cy="20" r="3" fill="{{ color }}"/>
+</svg>
+{% endmacro %}
+
+{% if session.get('user') %}
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark">{{ ring_mark(30) }}</span>
+      <span class="brand-name">RetinaScan</span>
+    </div>
+    <nav class="nav-links">
+      <a href="{{ url_for('home') }}" class="{{ 'active' if request.path == '/' else '' }}">New Screening</a>
+      <a href="{{ url_for('history') }}" class="{{ 'active' if request.path == '/history' else '' }}">Patient History</a>
+      <a href="{{ url_for('dashboard') }}" class="{{ 'active' if request.path == '/dashboard' else '' }}">Dashboard</a>
+      <a href="{{ url_for('export') }}">Export Data</a>
+    </nav>
+    <div class="sidebar-footer">
+      Signed in as <strong>{{ session.get('user') }}</strong><br>
+      <a href="{{ url_for('logout') }}">Log out</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% else %}
+  {% block auth_content %}{% endblock %}
+{% endif %}
+
+</body>
+</html>
